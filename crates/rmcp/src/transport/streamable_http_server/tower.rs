@@ -339,7 +339,7 @@ where
                     .get_service()
                     .map_err(internal_error_response("get service"))?;
                 // spawn a task to serve the session
-                tokio::spawn({
+                wasm_bindgen_futures::spawn_local({
                     let session_manager = self.session_manager.clone();
                     let session_id = session_id.clone();
                     async move {
@@ -400,7 +400,7 @@ where
                     let (transport, receiver) =
                         OneshotTransport::<RoleServer>::new(ClientJsonRpcMessage::Request(request));
                     let service = serve_directly(service, transport, None);
-                    tokio::spawn(async move {
+                    wasm_bindgen_futures::spawn_local(async move {
                         // on service created
                         let _ = service.waiting().await;
                     });

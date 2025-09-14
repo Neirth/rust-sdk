@@ -50,7 +50,7 @@ impl Drop for ChildWithCleanup {
         // We should not use start_kill(), instead we should use kill() to avoid zombies
         if let Some(mut inner) = self.inner.take() {
             // We don't care about the result, just try to kill it
-            tokio::spawn(async move {
+            wasm_bindgen_futures::spawn_local(async move {
                 if let Err(e) = Box::into_pin(inner.kill()).await {
                     tracing::warn!("Error killing child process: {}", e);
                 }

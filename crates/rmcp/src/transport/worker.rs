@@ -106,7 +106,7 @@ impl<W: Worker> WorkerTransport<W> {
             cancellation_token: transport_task_ct.clone(),
         };
 
-        let join_handle = tokio::spawn(async move {
+        let join_handle = wasm_bindgen_futures::spawn_local(async move {
             worker
                 .run(context)
                 .instrument(tracing::span!(

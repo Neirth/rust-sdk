@@ -307,7 +307,7 @@ impl<C: StreamableHttpClient> Worker for StreamableHttpClientWorker<C> {
             let client = self.client.clone();
             let session_id = session_id.clone();
             let url = config.uri.clone();
-            tokio::spawn(async move {
+            wasm_bindgen_futures::spawn_local(async move {
                 ct.cancelled().await;
                 let delete_session_result =
                     client.delete_session(url, session_id.clone(), None).await;

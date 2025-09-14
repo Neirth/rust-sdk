@@ -92,7 +92,7 @@ impl Drop for ProgressSubscriber {
         let token = self.progress_token.clone();
         self.receiver.close();
         let dispatcher = self.dispatcher.clone();
-        tokio::spawn(async move {
+        wasm_bindgen_futures::spawn_local(async move {
             let mut dispatcher = dispatcher.write_owned().await;
             dispatcher.remove(&token);
         });

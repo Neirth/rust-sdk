@@ -574,7 +574,7 @@ where
     let serve_loop_ct = ct.child_token();
     let peer_return: Peer<R> = peer.clone();
     let current_span = tracing::Span::current();
-    let handle = tokio::spawn(async move {
+    let handle = wasm_bindgen_futures::spawn_local(async move {
         let mut transport = transport.into_transport();
         let mut batch_messages = VecDeque::<RxJsonRpcMessage<R>>::new();
         let mut send_task_set = tokio::task::JoinSet::<SendTaskResult>::new();
@@ -689,7 +689,7 @@ where
                         }
                         let send = transport.send(m);
                         let current_span = tracing::Span::current();
-                        tokio::spawn(async move {
+                        wasm_bindgen_futures::spawn_local(async move {
                             let send_result = send.await;
                             if let Err(error) = send_result {
                                 tracing::error!(%error, "fail to response message");
@@ -760,7 +760,7 @@ where
                             extensions,
                         };
                         let current_span = tracing::Span::current();
-                        tokio::spawn(async move {
+                        wasm_bindgen_futures::spawn_local(async move {
                             let result = service
                                 .handle_request(request, context)
                                 .await;
@@ -807,7 +807,7 @@ where
                             extensions,
                         };
                         let current_span = tracing::Span::current();
-                        tokio::spawn(async move {
+                        wasm_bindgen_futures::spawn_local(async move {
                             let result = service.handle_notification(notification, context).await;
                             if let Err(error) = result {
                                 tracing::warn!(%error, "Error sending notification");

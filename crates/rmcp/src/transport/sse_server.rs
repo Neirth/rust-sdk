@@ -131,7 +131,7 @@ async fn sse_handler(
         }
     }));
 
-    tokio::spawn(async move {
+    wasm_bindgen_futures::spawn_local(async move {
         // Wait for connection closure
         to_client_tx_clone.closed().await;
 
@@ -194,7 +194,7 @@ impl Sink<TxJsonRpcMessage<RoleServer>> for SseServerTransport {
         if inner_close_result.is_ready() {
             let session_id = self.session_id.clone();
             let tx_store = self.tx_store.clone();
-            tokio::spawn(async move {
+            wasm_bindgen_futures::spawn_local(async move {
                 tx_store.write().await.remove(&session_id);
             });
         }
@@ -248,7 +248,7 @@ impl SseServer {
             ct.cancelled().await;
             tracing::info!("sse server cancelled");
         });
-        tokio::spawn(
+        wasm_bindgen_futures::spawn_local(
             async move {
                 if let Err(e) = server.await {
                     tracing::error!(error = %e, "sse server shutdown with error");
@@ -284,11 +284,11 @@ impl SseServer {
     {
         use crate::service::ServiceExt;
         let ct = self.config.ct.clone();
-        tokio::spawn(async move {
+        wasm_bindgen_futures::spawn_local(async move {
             while let Some(transport) = self.next_transport().await {
                 let service = service_provider();
                 let ct = self.config.ct.child_token();
-                tokio::spawn(async move {
+                wasm_bindgen_futures::spawn_local(async move {
                     let server = service
                         .serve_with_ct(transport, ct)
                         .await
@@ -308,11 +308,11 @@ impl SseServer {
         F: Fn() -> S + Send + 'static,
     {
         let ct = self.config.ct.clone();
-        tokio::spawn(async move {
+        wasm_bindgen_futures::spawn_local(async move {
             while let Some(transport) = self.next_transport().await {
                 let service = service_provider();
                 let ct = self.config.ct.child_token();
-                tokio::spawn(async move {
+                wasm_bindgen_futures::spawn_local(async move {
                     let server = serve_directly_with_ct(service, transport, None, ct);
                     server.waiting().await?;
                     tokio::io::Result::Ok(())
